@@ -13,7 +13,7 @@ import '../providers/class_providers.dart';
 class TaDashboardScreen extends ConsumerWidget {
   const TaDashboardScreen({super.key});
 
-  // Hàm hiển thị dialog để tạo lớp mới
+  // Hàm hiển thị dialog để tạo lớp mới (không thay đổi)
   void _showCreateClassDialog(BuildContext context, WidgetRef ref, UserModel currentUser) {
     final formKey = GlobalKey<FormState>();
     final classNameController = TextEditingController();
@@ -57,9 +57,8 @@ class TaDashboardScreen extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
-                  // Tạo một đối tượng ClassModel mới nhưng không có id
                   final newClass = ClassModel(
-                    id: '', // Firestore sẽ tự tạo id, nên để trống
+                    id: '',
                     className: classNameController.text,
                     description: descriptionController.text,
                     schedule: scheduleController.text,
@@ -69,9 +68,8 @@ class TaDashboardScreen extends ConsumerWidget {
                   );
 
                   try {
-                    // Gọi repository để tạo lớp
                     await ref.read(classRepositoryProvider).createClass(newClass);
-                    Navigator.pop(context); // Đóng dialog
+                    Navigator.pop(context);
                     SnackbarHelper.showSuccess(context, message: 'Tạo lớp thành công!');
                   } catch (e) {
                     SnackbarHelper.showError(context, message: 'Lỗi: $e');
@@ -88,7 +86,6 @@ class TaDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Lấy thông tin user đang đăng nhập để biết ai là người tạo lớp
     final authState = ref.watch(authStateChangesProvider);
     final currentUser = authState.asData?.value;
 
@@ -96,7 +93,6 @@ class TaDashboardScreen extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // Dùng userDataProvider để lấy UserModel (với displayName, role...)
     final userModelAsync = ref.watch(userDataProvider(currentUser.uid));
 
     return Scaffold(
@@ -116,7 +112,6 @@ class TaDashboardScreen extends ConsumerWidget {
         data: (userModel) {
           if (userModel == null) return const Center(child: Text("Không tìm thấy thông tin TA."));
 
-          // Lắng nghe danh sách lớp học của TA này bằng taClassesProvider
           final classesAsync = ref.watch(taClassesProvider(userModel.uid));
 
           return classesAsync.when(
@@ -126,25 +121,17 @@ class TaDashboardScreen extends ConsumerWidget {
                   child: Text('Bạn chưa quản lý lớp học nào.\nHãy tạo một lớp mới!', textAlign: TextAlign.center),
                 );
               }
-              // Hiển thị danh sách lớp học
-              return ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: classes.length,
-                itemBuilder: (context, index) {
-                  final aClass = classes[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8.0),
-                    child: ListTile(
-                      title: Text(aClass.className),
-                      subtitle: Text(aClass.description),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {
-                        // TODO: Giai đoạn 3: Điều hướng đến trang chi tiết lớp học
-                        // Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClassDetailScreen(classModel: aClass)));
-                        SnackbarHelper.showSuccess(context, message: "Chi tiết lớp ${aClass.className}");
-                      },
-                    ),
-                  );
+              // SỬ DỤNG LAYOUTBUILDER ĐỂ TẠO GIAO DIỆN RESPONSIVE
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  // Breakpoint: 600dp
+                  if (constraints.maxWidth < 600) {
+                    // Màn hình hẹp (điện thoại): Dùng ListView
+                    return _buildClassListView(context, classes);
+                  } else {
+                    // Màn hình rộng (máy tính bảng/máy tính): Dùng GridView
+                    return _buildClassGridView(context, classes);
+                  }
                 },
               );
             },
@@ -157,7 +144,6 @@ class TaDashboardScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Chỉ hiển thị dialog nếu đã có thông tin userModel
           final userModel = userModelAsync.asData?.value;
           if (userModel != null) {
             _showCreateClassDialog(context, ref, userModel);
@@ -165,6 +151,89 @@ class TaDashboardScreen extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
         tooltip: 'Tạo lớp học mới',
+      ),
+    );
+  }
+
+  // Widget riêng để build ListView
+  Widget _buildClassListView(BuildContext context, List<ClassModel> classes) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(8.0),
+      itemCount: classes.length,
+      itemBuilder: (context, index) {
+        final aClass = classes[index];
+        // Truyền context vào _buildClassCard
+        return _buildClassCard(context, aClass);
+      },
+    );
+  }
+  // Widget riêng để build GridView
+  Widget _buildClassGridView(BuildContext context, List<ClassModel> classes) {
+    // Tính toán số cột dựa trên chiều rộng
+    final screenWidth = MediaQuery.of(context).size.width; // Bây giờ nó sẽ hoạt động
+    // Cứ mỗi 450px thì thêm 1 cột, tối thiểu 2 cột, tối đa 4 cột
+    final crossAxisCount = (screenWidth / 450).floor().clamp(2, 4);
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16.0),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: 3 / 1.5, // Tỷ lệ W/H của mỗi card
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: classes.length,
+      itemBuilder: (context, index) {
+        final aClass = classes[index];
+        // Truyền context vào _buildClassCard
+        return _buildClassCard(context, aClass);
+      },
+    );
+  }
+
+  // Widget chung để build Card cho một lớp học (để tái sử dụng)
+  Widget _buildClassCard(BuildContext context, ClassModel aClass) {
+    return Card(
+      clipBehavior: Clip.antiAlias, // Để InkWell có hiệu ứng bo góc
+      child: InkWell( // Thêm hiệu ứng gợn sóng khi nhấn
+        onTap: () {
+          // TODO: Giai đoạn 3: Điều hướng đến trang chi tiết lớp học
+          // Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClassDetailScreen(classModel: aClass)));
+          SnackbarHelper.showSuccess(context, message: "Chi tiết lớp ${aClass.className}");
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                aClass.className,
+                style: Theme.of(context).textTheme.titleLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Text(
+                  aClass.description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Icon(Icons.schedule, size: 16, color: Colors.grey[700]),
+                  const SizedBox(width: 8),
+                  Text(aClass.schedule, style: Theme.of(context).textTheme.bodySmall),
+                  const Spacer(),
+                  const Icon(Icons.arrow_forward_ios, size: 16),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
