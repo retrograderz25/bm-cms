@@ -8,6 +8,7 @@ import '../../../data/models/class_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../authentication/providers/auth_providers.dart';
 import '../providers/class_providers.dart';
+import 'class_detail_screen.dart';
 // import 'class_detail_screen.dart'; // Sẽ dùng ở giai đoạn sau
 
 class TaDashboardScreen extends ConsumerWidget {
@@ -198,7 +199,7 @@ class TaDashboardScreen extends ConsumerWidget {
       child: InkWell( // Thêm hiệu ứng gợn sóng khi nhấn
         onTap: () {
           // TODO: Giai đoạn 3: Điều hướng đến trang chi tiết lớp học
-          // Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClassDetailScreen(classModel: aClass)));
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClassDetailScreen(classModel: aClass)));
           SnackbarHelper.showSuccess(context, message: "Chi tiết lớp ${aClass.className}");
         },
         child: Padding(

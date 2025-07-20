@@ -3,20 +3,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/class_model.dart';
+import '../../../data/models/enrollment_model.dart'; // THÊM IMPORT NÀY
 import '../../../data/repositories/class_repository.dart';
 
-// 1. Provider để cung cấp một instance của ClassRepository
+// --- PROVIDER CŨ (ĐÃ CÓ) ---
 final classRepositoryProvider = Provider<ClassRepository>((ref) {
-  // Lấy instance của Firestore đã được cung cấp ở tầng Auth
   return ClassRepository(FirebaseFirestore.instance);
 });
 
-// 2. Provider để cung cấp Stream danh sách lớp học của một TA
-// Sử dụng StreamProvider vì dữ liệu cần cập nhật real-time
-// Sử dụng .family để có thể truyền vào một tham số (taId)
 final taClassesProvider = StreamProvider.family<List<ClassModel>, String>((ref, taId) {
-  // Lấy repository từ provider ở trên
   final classRepository = ref.watch(classRepositoryProvider);
-  // Gọi phương thức để lấy stream
   return classRepository.getClassesForTA(taId);
+});
+
+// --- PROVIDER MỚI CẦN THÊM ---
+
+// Provider để lấy danh sách học sinh trong một lớp cụ thể
+final studentListProvider = StreamProvider.family<List<EnrollmentModel>, String>((ref, classId) {
+  final classRepository = ref.watch(classRepositoryProvider);
+  return classRepository.getStudentsInClass(classId);
 });
