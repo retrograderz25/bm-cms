@@ -135,4 +135,49 @@ class ClassRepository {
   Future<void> createAnnouncement(AnnouncementModel announcement) async {
     await _firestore.collection('announcements').add(announcement.toFirestore());
   }
+
+  /// Cập nhật thông tin của một lớp học.
+  Future<void> updateClass(ClassModel updatedClass) async {
+    try {
+      await _firestore
+          .collection('classes')
+          .doc(updatedClass.id)
+          .update(updatedClass.toFirestore());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Xóa một lớp học.
+  /// Lưu ý: Thao tác này hiện tại chỉ xóa document của lớp.
+  /// Để xóa tất cả dữ liệu liên quan (học sinh, BTVN, điểm), cần dùng Cloud Functions.
+  Future<void> deleteClass(String classId) async {
+    try {
+      await _firestore.collection('classes').doc(classId).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Cập nhật một thông báo đã có.
+  Future<void> updateAnnouncement(AnnouncementModel announcement) async {
+    try {
+      await _firestore
+          .collection('announcements')
+          .doc(announcement.id)
+          .update(announcement.toFirestore());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Xóa một thông báo.
+  Future<void> deleteAnnouncement(String announcementId) async {
+    try {
+      await _firestore.collection('announcements').doc(announcementId).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }

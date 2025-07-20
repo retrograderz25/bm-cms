@@ -200,7 +200,7 @@ class TaDashboardScreen extends ConsumerWidget {
         onTap: () {
           // TODO: Giai đoạn 3: Điều hướng đến trang chi tiết lớp học
           Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClassDetailScreen(classModel: aClass)));
-          SnackbarHelper.showSuccess(context, message: "Chi tiết lớp ${aClass.className}");
+          // SnackbarHelper.showSuccess(context, message: "Chi tiết lớp ${aClass.className}");
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -5,6 +5,7 @@ import '../../../common/utils/responsive_helper.dart';
 import '../../../data/models/class_model.dart';
 import '../widgets/announcement_list_tab.dart';
 import '../widgets/assignment_list_tab.dart';
+import '../widgets/class_settings_tab.dart';
 import '../widgets/student_list_tab.dart';
 
 class ClassDetailScreen extends StatefulWidget {
@@ -40,7 +41,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
       StudentListTab(classId: classId),
       AssignmentListTab(classId: classId),
       const Center(child: Text('Nội dung Bảng điểm')), // Placeholder
-      AnnouncementListTab(classId: classId),  // Placeholder
+      AnnouncementListTab(classId: classId),
+      ClassSettingsTab(classModel: widget.classModel),
     ];
 
     _destinations = [
@@ -63,6 +65,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
         icon: Icon(Icons.announcement_outlined),
         selectedIcon: Icon(Icons.announcement),
         label: Text('Thông báo'),
+      ),
+      const NavigationRailDestination(
+        icon: Icon(Icons.settings_outlined),
+        selectedIcon: Icon(Icons.settings),
+        label: Text('Cài đặt'),
       ),
     ];
 
