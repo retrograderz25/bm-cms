@@ -1,5 +1,6 @@
 // lib/src/features/student_dashboard/screens/student_dashboard_screen.dart
 
+import 'package:bm_cms/src/features/student_dashboard/screens/student_class_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../authentication/providers/auth_providers.dart';
@@ -57,6 +58,11 @@ class StudentDashboardScreen extends ConsumerWidget {
                   ),
                   onTap: () {
                     // TODO: Điều hướng đến trang chi tiết lớp học của học sinh
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => StudentClassDetailScreen(classModel: aClass),
+                      ),
+                    );
                   },
                 ),
               );

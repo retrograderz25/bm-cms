@@ -1,28 +1,24 @@
-// lib/src/features/ta_dashboard/screens/class_detail_screen.dart
+// lib/src/features/student_dashboard/screens/student_class_detail_screen.dart
 
 import 'package:flutter/material.dart';
 import '../../../common/utils/responsive_helper.dart';
 import '../../../data/models/class_model.dart';
-import '../widgets/assignment_list_tab.dart';
-import '../widgets/student_list_tab.dart';
+import '../widgets/student_grade_list_tab.dart'; // Sẽ tạo ngay sau đây
 
-class ClassDetailScreen extends StatefulWidget {
+class StudentClassDetailScreen extends StatefulWidget {
   final ClassModel classModel;
 
-  const ClassDetailScreen({super.key, required this.classModel});
+  const StudentClassDetailScreen({super.key, required this.classModel});
 
   @override
-  State<ClassDetailScreen> createState() => _ClassDetailScreenState();
+  State<StudentClassDetailScreen> createState() => _StudentClassDetailScreenState();
 }
 
-class _ClassDetailScreenState extends State<ClassDetailScreen> {
+class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
   int _selectedIndex = 0;
 
-  // Khai báo danh sách nhưng sẽ khởi tạo trong initState
   late final List<Widget> _tabs;
   late final List<NavigationRailDestination> _destinations;
-  // Thêm danh sách riêng cho labels của TabBar để an toàn hơn
-  late final List<String> _tabLabels;
 
   @override
   void initState() {
@@ -31,32 +27,22 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
   }
 
   void _initializeTabs() {
-    final classId = widget.classModel.id;
-
-    // --- CẤU HÌNH CHO 4 TAB ---
-
     _tabs = [
-      StudentListTab(classId: classId),
-      AssignmentListTab(classId: classId),
-      const Center(child: Text('Nội dung Bảng điểm')), // Placeholder
-      const Center(child: Text('Nội dung Thông báo')),  // Placeholder
+      StudentGradeListTab(classId: widget.classModel.id), // Tab điểm số
+      const Center(child: Text('Tài liệu học tập')), // Placeholder
+      const Center(child: Text('Thông báo')), // Placeholder
     ];
 
     _destinations = [
       const NavigationRailDestination(
-        icon: Icon(Icons.people_outline),
-        selectedIcon: Icon(Icons.people),
-        label: Text('Học sinh'),
+        icon: Icon(Icons.history_edu_outlined),
+        selectedIcon: Icon(Icons.history_edu),
+        label: Text('Điểm số'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.assignment_outlined),
-        selectedIcon: Icon(Icons.assignment),
-        label: Text('BTVN'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_outlined),
-        selectedIcon: Icon(Icons.bar_chart),
-        label: Text('Bảng điểm'),
+        icon: Icon(Icons.folder_outlined),
+        selectedIcon: Icon(Icons.folder),
+        label: Text('Tài liệu'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.announcement_outlined),
@@ -64,9 +50,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
         label: Text('Thông báo'),
       ),
     ];
-
-    // Lấy label từ destinations một cách an toàn
-    _tabLabels = _destinations.map((d) => (d.label as Text).data!).toList();
   }
 
   @override
@@ -78,8 +61,10 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
     }
   }
 
+  // Các hàm _buildMobileLayout và _buildDesktopLayout tương tự như của TA
+  // ... (Bạn có thể copy-paste từ class_detail_screen.dart và sửa lại)
+
   Widget _buildMobileLayout() {
-    // length phải khớp nhau
     return DefaultTabController(
       length: _tabs.length,
       child: Scaffold(
@@ -87,13 +72,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
           title: Text(widget.classModel.className),
           bottom: TabBar(
             isScrollable: true,
-            // Xây dựng các tab từ cấu hình đã có
-            tabs: List.generate(_tabs.length, (index) {
-              return Tab(
-                icon: _destinations[index].icon,
-                text: _tabLabels[index],
-              );
-            }),
+            tabs: _destinations.map((d) => Tab(icon: d.icon, text: (d.label as Text).data!)).toList(),
           ),
         ),
         body: TabBarView(children: _tabs),
@@ -119,9 +98,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
             destinations: _destinations,
           ),
           const VerticalDivider(thickness: 1, width: 1),
-          Expanded(
-            child: _tabs[_selectedIndex],
-          ),
+          Expanded(child: _tabs[_selectedIndex]),
         ],
       ),
     );
