@@ -2,6 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../data/models/announcement_model.dart';
 import '../../../data/models/class_model.dart';
 import '../../../data/models/enrollment_model.dart'; // THÊM IMPORT NÀY
 import '../../../data/repositories/class_repository.dart';
@@ -22,4 +23,10 @@ final taClassesProvider = StreamProvider.family<List<ClassModel>, String>((ref, 
 final studentListProvider = StreamProvider.family<List<EnrollmentModel>, String>((ref, classId) {
   final classRepository = ref.watch(classRepositoryProvider);
   return classRepository.getStudentsInClass(classId);
+});
+
+// --- PROVIDER MỚI CHO THÔNG BÁO ---
+final announcementsProvider = StreamProvider.family<List<AnnouncementModel>, String>((ref, classId) {
+  final repo = ref.watch(classRepositoryProvider);
+  return repo.getAnnouncements(classId);
 });

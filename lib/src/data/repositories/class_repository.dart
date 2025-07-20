@@ -1,6 +1,7 @@
 // lib/src/data/repositories/class_repository.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/announcement_model.dart';
 import '../models/class_model.dart';
 import '../models/enrollment_model.dart';
 import '../models/user_model.dart';
@@ -114,5 +115,24 @@ class ClassRepository {
 
       return classDocs.docs.map((doc) => ClassModel.fromFirestore(doc)).toList();
     });
+  }
+
+  // --- CÁC PHƯƠNG THỨC MỚI CHO THÔNG BÁO ---
+
+  /// Lấy danh sách thông báo của một lớp, sắp xếp mới nhất lên đầu.
+  Stream<List<AnnouncementModel>> getAnnouncements(String classId) {
+    return _firestore
+        .collection('announcements')
+        .where('classId', isEqualTo: classId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => AnnouncementModel.fromFirestore(doc))
+        .toList());
+  }
+
+  /// Tạo một thông báo mới.
+  Future<void> createAnnouncement(AnnouncementModel announcement) async {
+    await _firestore.collection('announcements').add(announcement.toFirestore());
   }
 }

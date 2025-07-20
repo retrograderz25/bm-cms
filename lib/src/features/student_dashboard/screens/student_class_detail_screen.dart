@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/utils/responsive_helper.dart';
 import '../../../data/models/class_model.dart';
+import '../widgets/student_announcement_tab.dart';
 import '../widgets/student_grade_list_tab.dart'; // Sẽ tạo ngay sau đây
 
 class StudentClassDetailScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
     _tabs = [
       StudentGradeListTab(classId: widget.classModel.id), // Tab điểm số
       const Center(child: Text('Tài liệu học tập')), // Placeholder
-      const Center(child: Text('Thông báo')), // Placeholder
+      StudentAnnouncementTab(classId: widget.classModel.id),
     ];
 
     _destinations = [

@@ -13,7 +13,7 @@ class AssignmentListTab extends ConsumerWidget {
   final String classId;
   const AssignmentListTab({super.key, required this.classId});
 
-  // HÀM MỚI: HIỂN THỊ DIALOG TẠO BTVN
+  // Hàm hiển thị dialog để tạo BTVN mới (Không có thay đổi trong logic)
   void _showCreateAssignmentDialog(BuildContext context, WidgetRef ref) {
     final formKey = GlobalKey<FormState>();
     final titleController = TextEditingController();
@@ -24,7 +24,6 @@ class AssignmentListTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) {
-        // Sử dụng StatefulWidgetBuilder để quản lý state bên trong dialog
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
@@ -47,8 +46,8 @@ class AssignmentListTab extends ConsumerWidget {
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
-                      // Nút chọn ngày học
                       ListTile(
+                        contentPadding: EdgeInsets.zero,
                         title: const Text('Ngày học'),
                         subtitle: Text(sessionDate == null
                             ? 'Chưa chọn'
@@ -68,8 +67,8 @@ class AssignmentListTab extends ConsumerWidget {
                           }
                         },
                       ),
-                      // Nút chọn hạn nộp
                       ListTile(
+                        contentPadding: EdgeInsets.zero,
                         title: const Text('Hạn nộp'),
                         subtitle: Text(dueDate == null
                             ? 'Chưa chọn'
@@ -99,7 +98,7 @@ class AssignmentListTab extends ConsumerWidget {
                   onPressed: () async {
                     if (formKey.currentState!.validate() && sessionDate != null && dueDate != null) {
                       final newAssignment = AssignmentModel(
-                        id: '', // Firestore sẽ tự tạo
+                        id: '',
                         classId: classId,
                         title: titleController.text,
                         description: descriptionController.text,
@@ -110,7 +109,7 @@ class AssignmentListTab extends ConsumerWidget {
 
                       try {
                         await ref.read(learningRepositoryProvider).createAssignment(newAssignment);
-                        Navigator.pop(context); // Đóng dialog
+                        Navigator.pop(context);
                         SnackbarHelper.showSuccess(context, message: 'Tạo BTVN thành công!');
                       } catch (e) {
                         SnackbarHelper.showError(context, message: 'Lỗi: $e');
@@ -145,12 +144,30 @@ class AssignmentListTab extends ConsumerWidget {
             itemBuilder: (context, index) {
               final assignment = assignments[index];
               return Card(
+                margin: const EdgeInsets.only(bottom: 8.0),
                 child: ListTile(
-                  title: Text(assignment.title),
-                  subtitle: Text('Ngày học: ${DateFormat.yMd().format(assignment.sessionDate.toDate())} | Hạn nộp: ${DateFormat.yMd().format(assignment.dueDate.toDate())}'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
+                  // CẬP NHẬT TỪ ĐÂY
+                  title: Text(assignment.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4),
+                      Text(
+                        assignment.description.isEmpty ? '(Không có mô tả)' : assignment.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Ngày học: ${DateFormat.yMd().format(assignment.sessionDate.toDate())}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                  isThreeLine: true, // Cho phép subtitle có nhiều dòng để hiển thị đầy đủ
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
-                    // TODO: Điều hướng đến trang chấm điểm cho BTVN này
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => GradingScreen(
@@ -160,6 +177,7 @@ class AssignmentListTab extends ConsumerWidget {
                       ),
                     );
                   },
+                  // ĐẾN ĐÂY
                 ),
               );
             },
@@ -170,7 +188,6 @@ class AssignmentListTab extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // GỌI HÀM HIỂN THỊ DIALOG
           _showCreateAssignmentDialog(context, ref);
         },
         label: const Text('Tạo BTVN'),

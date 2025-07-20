@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/utils/responsive_helper.dart';
 import '../../../data/models/class_model.dart';
+import '../widgets/announcement_list_tab.dart';
 import '../widgets/assignment_list_tab.dart';
 import '../widgets/student_list_tab.dart';
 
@@ -39,7 +40,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
       StudentListTab(classId: classId),
       AssignmentListTab(classId: classId),
       const Center(child: Text('Nội dung Bảng điểm')), // Placeholder
-      const Center(child: Text('Nội dung Thông báo')),  // Placeholder
+      AnnouncementListTab(classId: classId),  // Placeholder
     ];
 
     _destinations = [
