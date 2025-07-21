@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/user_model.dart';
+import '../../admin/screens/admin_dashboard_screen.dart';
 import '../providers/auth_providers.dart';
 import 'login_screen.dart';
 import '../../ta_dashboard/screens/ta_dashboard_screen.dart';
@@ -25,6 +26,8 @@ class AuthWrapper extends ConsumerWidget {
               if (userModel != null) {
                 // Dựa vào vai trò để điều hướng
                 switch (userModel.role) {
+                  case UserRole.admin: // <-- THÊM CASE MỚI
+                    return const AdminDashboardScreen();
                   case UserRole.ta:
                     return const TaDashboardScreen();
                   case UserRole.student:

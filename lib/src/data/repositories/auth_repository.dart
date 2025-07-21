@@ -32,29 +32,28 @@ class AuthRepository {
     try {
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException {
-      // Ném lại lỗi để UI xử lý
       rethrow;
     }
   }
 
-  // Đăng ký tài khoản mới
+  // --- HÀM SIGNUP ĐƯỢC CẬP NHẬT ---
   Future<UserCredential> signUpWithEmailAndPassword({
     required String email,
     required String password,
     required String displayName,
-    required UserRole role, // Nhận vào một Enum thay vì String
+    required UserRole role,
+    // Thêm các tham số tùy chọn cho học sinh
+    StudentStatus? status,
+    String? gradeLevel,
   }) async {
     try {
-      // 1. Tạo người dùng trong Firebase Authentication
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Cập nhật tên hiển thị trong Firebase Auth (tùy chọn nhưng nên có)
       await userCredential.user?.updateDisplayName(displayName);
 
-      // 2. Tạo đối tượng UserModel mới
       final user = userCredential.user;
       if (user != null) {
         final newUser = UserModel(
@@ -63,15 +62,51 @@ class AuthRepository {
           displayName: displayName,
           role: role,
           createdAt: Timestamp.now(),
+          // Gán các giá trị mới
+          status: status,
+          gradeLevel: gradeLevel,
         );
 
-        // 3. Lưu đối tượng UserModel vào Firestore collection 'users'
-        // Document ID chính là uid của người dùng
         await _firestore.collection('users').doc(newUser.uid).set(newUser.toFirestore());
       }
 
       return userCredential;
     } on FirebaseAuthException {
+      rethrow;
+    }
+  }
+
+  // --- CÁC PHƯƠNG THỨC MỚI CHO ADMIN ---
+
+  // Lấy danh sách tất cả người dùng trong hệ thống.
+  // Sử dụng Stream để tự động cập nhật.
+
+  Stream<List<UserModel>> getAllUsers() {
+    return _firestore
+        .collection('users')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+        snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
+  }
+
+  /// Cập nhật thông tin của một người dùng.
+  /// Dùng bởi Admin.
+
+  Future<void> updateUser(UserModel user) async {
+    try {
+      await _firestore.collection('users').doc(user.uid).update(user.toFirestore());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Xóa document của một người dùng trong Firestore.
+  /// Chỉ Admin mới có quyền thực hiện.
+  Future<void> deleteUserDoc(String uid) async {
+    try {
+      await _firestore.collection('users').doc(uid).delete();
+    } catch (e) {
       rethrow;
     }
   }

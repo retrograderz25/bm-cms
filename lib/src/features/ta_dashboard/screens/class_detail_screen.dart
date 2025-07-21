@@ -20,10 +20,8 @@ class ClassDetailScreen extends StatefulWidget {
 class _ClassDetailScreenState extends State<ClassDetailScreen> {
   int _selectedIndex = 0;
 
-  // Khai báo danh sách nhưng sẽ khởi tạo trong initState
   late final List<Widget> _tabs;
   late final List<NavigationRailDestination> _destinations;
-  // Thêm danh sách riêng cho labels của TabBar để an toàn hơn
   late final List<String> _tabLabels;
 
   @override
@@ -35,12 +33,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
   void _initializeTabs() {
     final classId = widget.classModel.id;
 
-    // --- CẤU HÌNH CHO 4 TAB ---
-
     _tabs = [
       StudentListTab(classId: classId),
-      AssignmentListTab(classId: classId),
-      const Center(child: Text('Nội dung Bảng điểm')), // Placeholder
+      // THAY ĐỔI QUAN TRỌNG: Truyền cả object ClassModel
+      AssignmentListTab(classModel: widget.classModel),
+      const Center(child: Text('Nội dung Bảng điểm')),
       AnnouncementListTab(classId: classId),
       ClassSettingsTab(classModel: widget.classModel),
     ];
@@ -73,7 +70,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
       ),
     ];
 
-    // Lấy label từ destinations một cách an toàn
     _tabLabels = _destinations.map((d) => (d.label as Text).data!).toList();
   }
 
@@ -87,7 +83,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
   }
 
   Widget _buildMobileLayout() {
-    // length phải khớp nhau
     return DefaultTabController(
       length: _tabs.length,
       child: Scaffold(
@@ -95,7 +90,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
           title: Text(widget.classModel.className),
           bottom: TabBar(
             isScrollable: true,
-            // Xây dựng các tab từ cấu hình đã có
             tabs: List.generate(_tabs.length, (index) {
               return Tab(
                 icon: _destinations[index].icon,

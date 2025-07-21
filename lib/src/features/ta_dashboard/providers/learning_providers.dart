@@ -39,3 +39,9 @@ final studentSubmissionsProvider = StreamProvider.family<List<SubmissionModel>, 
   final repo = ref.watch(learningRepositoryProvider);
   return repo.getSubmissionsForStudent(ids.classId, ids.studentId);
 });
+
+/// Provider để lấy tất cả điểm cho một bài tập.
+final submissionsForAssignmentProvider = StreamProvider.family<List<SubmissionModel>, String>((ref, assignmentId) {
+  final repo = ref.watch(learningRepositoryProvider);
+  return repo.getSubmissionsForAssignment(assignmentId);
+});

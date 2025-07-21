@@ -90,4 +90,16 @@ class LearningRepository {
       await _firestore.collection('submissions').add(submission.toFirestore());
     }
   }
+
+  /// Lấy tất cả các submissions (điểm) cho một bài tập cụ thể.
+  Stream<List<SubmissionModel>> getSubmissionsForAssignment(String assignmentId) {
+    return _firestore
+        .collection('submissions')
+        .where('assignmentId', isEqualTo: assignmentId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => SubmissionModel.fromFirestore(doc))
+        .toList());
+  }
+
 }
