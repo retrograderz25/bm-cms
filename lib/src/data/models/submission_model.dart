@@ -11,6 +11,7 @@ class SubmissionModel {
   final double? grade; // Điểm số, có thể null nếu chưa chấm
   final SubmissionStatus status; // Đã chấm, chờ chấm, còn nợ
   final String? feedback; // Nhận xét của TA
+  final String? qualityFeedback;
 
   SubmissionModel({
     required this.id,
@@ -20,6 +21,7 @@ class SubmissionModel {
     this.grade,
     required this.status,
     this.feedback,
+    this.qualityFeedback,
   });
 
   factory SubmissionModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -35,6 +37,7 @@ class SubmissionModel {
         orElse: () => SubmissionStatus.missing,
       ),
       feedback: data['feedback'],
+      qualityFeedback: data['qualityFeedback'],
     );
   }
 
@@ -46,6 +49,7 @@ class SubmissionModel {
       'grade': grade,
       'status': status.name,
       'feedback': feedback,
+      'qualityFeedback': qualityFeedback,
     };
   }
 }

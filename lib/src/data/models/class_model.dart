@@ -10,6 +10,8 @@ class ClassModel {
   final String taName; // Tên người tạo, để hiển thị nhanh
   final String schedule;
   final Timestamp createdAt;
+  final String? teacherName;
+  final String? groupName;
 
   ClassModel({
     required this.id,
@@ -19,6 +21,8 @@ class ClassModel {
     required this.taName,
     required this.schedule,
     required this.createdAt,
+    this.teacherName,
+    this.groupName,
   });
 
   // Factory constructor để tạo ClassModel từ dữ liệu Firestore
@@ -32,6 +36,8 @@ class ClassModel {
       taName: data['taName'] ?? '',
       schedule: data['schedule'] ?? '',
       createdAt: data['createdAt'] ?? Timestamp.now(),
+      teacherName: data['teacherName'],
+      groupName: data['groupName'],
     );
   }
 
@@ -44,6 +50,8 @@ class ClassModel {
       'taName': taName,
       'schedule': schedule,
       'createdAt': createdAt,
+      'teacherName': teacherName,
+      'groupName': groupName,
     };
   }
 }

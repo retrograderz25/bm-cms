@@ -73,9 +73,9 @@ class GradingScreen extends ConsumerWidget {
               try {
                 final students = await ref.read(studentListProvider(classModel.id).future);
                 final submissions = await ref.read(submissionsForAssignmentProvider(assignment.id).future);
-                await ExcelExporter.generateGradeExcel(
-                  className: classModel.className,
-                  assignmentTitle: assignment.title,
+                await ExcelExporter.generateComprehensiveGradeExcel(
+                  classModel: classModel,
+                  assignment: assignment,
                   students: students,
                   submissions: submissions,
                 );
