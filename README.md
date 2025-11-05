@@ -3,7 +3,7 @@
 A new Flutter project.
 
 # Project Structure
-
+```
 flutter_student_manager/
 ├── lib/
 │   ├── main.dart                   <-- Điểm khởi đầu của ứng dụng
@@ -51,3 +51,4 @@ flutter_student_manager/
 │               └── widgets/
 │
 └── pubspec.yaml
+```
